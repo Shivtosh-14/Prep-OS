@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Prep OS</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #190019; /* black background */
+			--card: #2B124C; /* purple boxes */
+			--card-2: #522B5B; /* lighter purple for elements */
+			--muted: #DFB6B2; /* muted text */
+			--text: #FBE4D8; /* primary text */
+			--cream: #FBE4D8; /* text on dark */
+			--accent: #522B5B; /* purple accent */
+			--accent-2: #2B124C; /* deeper purple */
+		}
+		* { box-sizing: border-box; }
+		html, body { height: 100%; }
+		body {
+			margin: 0;
+			font-family: Manrope, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+			background: var(--bg);
+			color: var(--text);
+			padding: 24px;
+		}
+		.container {
+			max-width: 960px;
+			margin: 0 auto;
+		}
+		.header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+		.login-btn {
+			background: var(--accent);
+			border: none;
+			border-radius: 8px;
+			padding: 10px 20px;
+			color: var(--cream);
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+			text-decoration: none;
+			display: inline-block;
+		}
+		.login-btn:hover {
+			background: var(--accent-2);
+		}
+		.user-info {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			color: var(--muted);
+			font-weight: 600;
+		}
+		.user-avatar {
+			width: 40px;
+			height: 40px;
+			background: var(--accent);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--cream);
+			font-size: 18px;
+			font-weight: 600;
+		}
+		.logout-btn {
+			background: none;
+			border: 1px solid var(--muted);
+			border-radius: 6px;
+			padding: 6px 12px;
+			color: var(--muted);
+			font-size: 12px;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+		.logout-btn:hover {
+			background: var(--muted);
+			color: var(--card);
+		}
+		.brand {
+			text-align: center;
+			margin: 40px 0 30px 0;
+		}
+		.brand-logo {
+			height: 270px;
+			width: auto;
+			max-width: 100%;
+			object-fit: contain;
+			display: block;
+			margin: 0 auto;
+			transition: transform 0.2s ease;
+		}
+		.brand-logo:hover {
+			transform: scale(1.02);
+		}
+		@media (max-width: 768px) {
+			.brand-logo {
+				height: 203px;
+			}
+		}
+		@media (max-width: 480px) {
+			.brand-logo {
+				height: 169px;
+			}
+		}
+		.pick-section {
+			text-align: center;
+			margin-bottom: 80px;
+		}
+		.who-section {
+			margin-top: 350px;
+			margin-bottom: 60px;
+		}
+		.who-title {
+			font-family: Manrope;
+			font-size: 64px;
+			font-weight: 700;
+			color: var(--muted);
+			margin: 0 0 20px 0;
+			letter-spacing: -1px;
+		}
+		.who-subtitle {
+			font-size: 18px;
+			color: var(--muted);
+			margin: 0;
+		}
+		.arrow-text {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 8px;
+			margin-bottom: 30px;
+			width: 100%;
+		}
+		.curvy-arrow {
+			font-size: 32px;
+			color: var(--muted);
+			transform: rotate(45deg);
+		}
+		.pick-text {
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--muted);
+		}
+		.course-selection {
+			background: var(--card);
+			border: 1px solid #6d5147;
+			border-radius: 20px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+			padding: 40px;
+			color: var(--cream);
+			max-width: 800px;
+			margin: 0 auto;
+		}
+		.course-title {
+			font-size: 24px;
+			font-weight: 600;
+			margin: 0 0 30px 0;
+			text-align: center;
+			color: var(--cream);
+		}
+		.card-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 20px;
+		}
+		@media (max-width: 768px) {
+			.card-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+		@media (max-width: 480px) {
+			.card-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+		.course-card {
+			background: var(--accent);
+			border: none;
+			border-radius: 12px;
+			padding: 20px;
+			color: var(--cream);
+			font-size: 18px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			text-align: center;
+		}
+		.course-card:hover {
+			background: var(--accent-2);
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+		}
+
+		/* AI Chat Interface */
+		.ai-chat-container {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			width: 350px;
+			height: 500px;
+			background: var(--card);
+			border: 1px solid #6d5147;
+			border-radius: 16px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+			display: flex;
+			flex-direction: column;
+			z-index: 1000;
+			transform: translateY(calc(100% - 60px));
+			transition: transform 0.3s ease;
+			overflow: hidden;
+		}
+		.ai-chat-container.open {
+			transform: translateY(0);
+		}
+		.chat-header {
+			background: var(--accent);
+			padding: 15px 20px;
+			border-radius: 16px 16px 0 0;
+			cursor: pointer;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.chat-title-container {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		.chat-icon {
+			width: 32px;
+			height: 32px;
+			object-fit: contain;
+			flex-shrink: 0;
+			border-radius: 4px;
+			transition: opacity 0.2s ease;
+		}
+		.chat-icon:hover {
+			opacity: 0.8;
+		}
+		.chat-title {
+			color: var(--cream);
+			font-size: 16px;
+			font-weight: 600;
+			margin: 0;
+		}
+		.chat-toggle {
+			background: none;
+			border: none;
+			color: var(--cream);
+			font-size: 18px;
+			cursor: pointer;
+			transition: transform 0.2s ease;
+		}
+		.chat-toggle.open {
+			transform: rotate(180deg);
+		}
+		.chat-messages {
+			flex: 1;
+			padding: 20px;
+			overflow-y: auto;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+		.message {
+			padding: 12px 16px;
+			border-radius: 12px;
+			max-width: 80%;
+			font-size: 14px;
+			line-height: 1.4;
+		}
+		.message.user {
+			background: var(--accent);
+			color: #000000;
+			align-self: flex-end;
+			margin-left: auto;
+		}
+		.message.ai {
+			background: #f7f3ef;
+			color: #000000;
+			align-self: flex-start;
+			margin-right: auto;
+		}
+		.chat-input-container {
+			padding: 15px 20px;
+			border-top: 1px solid #6d5147;
+			display: flex;
+			gap: 10px;
+		}
+		.chat-input {
+			flex: 1;
+			background: var(--cream);
+			border: 1px solid #cbb7ae;
+			border-radius: 8px;
+			padding: 10px 12px;
+			font-size: 14px;
+			color: #000000;
+			outline: none;
+		}
+		.chat-input:focus {
+			border-color: var(--accent);
+		}
+		.chat-send {
+			background: var(--accent);
+			border: none;
+			border-radius: 8px;
+			padding: 10px 15px;
+			color: var(--cream);
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+		}
+		.chat-send:hover {
+			background: var(--accent-2);
+		}
+		.chat-send:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+		.typing-indicator {
+			display: none;
+			align-items: center;
+			gap: 4px;
+			color: var(--muted);
+			font-size: 12px;
+		}
+		.typing-dots {
+			display: flex;
+			gap: 2px;
+		}
+		.typing-dot {
+			width: 4px;
+			height: 4px;
+			background: var(--muted);
+			border-radius: 50%;
+			animation: typing 1.4s infinite;
+		}
+		.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+		.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+		@keyframes typing {
+			0%, 60%, 100% { transform: translateY(0); }
+			30% { transform: translateY(-8px); }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<div></div>
+			<div id="userSection">
+				<button class="login-btn" id="loginBtn" onclick="signInWithGoogle()">Login with Google</button>
+				<div class="user-info" id="userInfo" style="display: none;">
+					<div class="user-avatar" id="userAvatar"></div>
+					<span id="userName"></span>
+					<button class="logout-btn" onclick="logout()">Logout</button>
+				</div>
+			</div>
+		</div>
+		<div class="brand">
+			<img src="PREP-OS-TITLE-LOGO.png" alt="Prep OS" class="brand-logo">
+		</div>
+		
+		<div class="pick-section">
+			<div class="arrow-text">
+				<div class="curvy-arrow">↘</div>
+				<div class="pick-text">Pick a course!</div>
+			</div>
+			
+			<div class="course-selection">
+				<h2 class="course-title">Choose Your Course</h2>
+				<div class="card-grid">
+					<button class="course-card" onclick="window.location.href='year.html?course=SAT'">SAT</button>
+					<button class="course-card" onclick="window.location.href='year.html?course=CUET'">CUET</button>
+					<button class="course-card" onclick="window.location.href='year.html?course=NEET'">NEET</button>
+					<button class="course-card" onclick="window.location.href='year.html?course=JEE'">JEE</button>
+					<button class="course-card" onclick="window.location.href='year.html?course=ESAT'">ESAT</button>
+					<button class="course-card" onclick="window.location.href='year.html?course=LSAT'">LSAT</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="who-section">
+			<h1 class="who-title">Who are we?</h1>
+			<p class="who-subtitle">We know what its like to be a student giving competitive exams such as NEET, JEE and SAT. 
+				Fact is, we fight an uphill battle. There are so many options and resources to help oneself in our pursuit of higher education, 
+				however most of them charge obscene amounts and often funnel students into other products. Not us. 
+				As the first ever made by students platform for most major exams in India, we provide several innovative resources and combine them into one app. Prep OS. 
+				There is no more need to go scouring the internet for more and more resources, wasting valuable time into things we should never have to invest time on. 
+				It is time for you to join Prep OS.</p>
+		</div>
+	</div>
+
+	<!-- AI Chat Interface -->
+	<div class="ai-chat-container" id="chatContainer">
+		<div class="chat-header" onclick="toggleChat()">
+			<div class="chat-title-container">
+				<img src="PREP-OS_LOGO-removebg-preview.png" alt="Study Assistant Icon" class="chat-icon" id="studyAssistantIcon">
+				<h3 class="chat-title">Study Assistant</h3>
+			</div>
+			<button class="chat-toggle" id="chatToggle">▼</button>
+		</div>
+		<div class="chat-messages" id="chatMessages">
+			<div class="message ai">
+				Hi! I'm your Study Assistant. I can help you with questions about SAT, JEE, NEET, CUET, ESAT, and LSAT preparation. What would you like to know?
+			</div>
+		</div>
+		<div class="typing-indicator" id="typingIndicator">
+			<span>AI is typing</span>
+			<div class="typing-dots">
+				<div class="typing-dot"></div>
+				<div class="typing-dot"></div>
+				<div class="typing-dot"></div>
+			</div>
+		</div>
+		<div class="chat-input-container">
+			<input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about your studies..." onkeypress="handleKeyPress(event)">
+			<button class="chat-send" id="chatSend" onclick="sendMessage()">Send</button>
+		</div>
+	</div>
+
+	<script>
+		let chatOpen = false;
+		let isTyping = false;
+
+		function toggleChat() {
+			chatOpen = !chatOpen;
+			const container = document.getElementById('chatContainer');
+			const toggle = document.getElementById('chatToggle');
+			
+			if (chatOpen) {
+				container.classList.add('open');
+				toggle.classList.add('open');
+				document.getElementById('chatInput').focus();
+			} else {
+				container.classList.remove('open');
+				toggle.classList.remove('open');
+			}
+		}
+
+		function handleKeyPress(event) {
+			if (event.key === 'Enter') {
+				sendMessage();
+			}
+		}
+
+		function addMessage(content, isUser = false) {
+			const messagesContainer = document.getElementById('chatMessages');
+			const messageDiv = document.createElement('div');
+			messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+			messageDiv.textContent = content;
+			messagesContainer.appendChild(messageDiv);
+			messagesContainer.scrollTop = messagesContainer.scrollHeight;
+		}
+
+		function showTyping() {
+			const typingIndicator = document.getElementById('typingIndicator');
+			typingIndicator.style.display = 'flex';
+			isTyping = true;
+		}
+
+		function hideTyping() {
+			const typingIndicator = document.getElementById('typingIndicator');
+			typingIndicator.style.display = 'none';
+			isTyping = false;
+		}
+
+		function getAIResponse(userMessage) {
+			const message = userMessage.toLowerCase();
+			
+			// Study tips and general advice
+			if (message.includes('study') || message.includes('studying')) {
+				return "Here are some effective study tips:\n\n• Use the Pomodoro Technique (25 min study + 5 min break)\n• Create a consistent study schedule\n• Use active recall and spaced repetition\n• Take practice tests regularly\n• Focus on understanding concepts, not just memorizing\n• Get enough sleep and stay hydrated!";
+			}
+			
+			// SAT specific
+			if (message.includes('sat')) {
+				if (message.includes('math')) {
+					return "SAT Math Tips:\n\n• Master algebra, geometry, and basic trigonometry\n• Practice with official College Board materials\n• Learn to use your calculator efficiently\n• Focus on problem-solving strategies\n• Time management is crucial - aim for 1.25 minutes per question";
+				} else if (message.includes('reading')) {
+					return "SAT Reading Tips:\n\n• Read the passage actively, not passively\n• Look for main ideas and supporting details\n• Don't get stuck on difficult words - use context\n• Answer questions in order of difficulty\n• Practice with diverse passage types";
+				} else if (message.includes('writing')) {
+					return "SAT Writing Tips:\n\n• Learn grammar rules thoroughly\n• Practice identifying sentence errors\n• Focus on clarity and conciseness\n• Understand punctuation rules\n• Read the entire sentence, not just the underlined portion";
+				} else {
+					return "SAT Overview:\n\n• Total time: 3 hours (with essay: 3 hours 50 minutes)\n• Sections: Reading, Writing & Language, Math (No Calculator), Math (Calculator)\n• Score range: 400-1600\n• Best prep: Official College Board practice tests\n• Register at collegeboard.org";
+				}
+			}
+			
+			// JEE specific
+			if (message.includes('jee')) {
+				if (message.includes('physics')) {
+					return "JEE Physics Tips:\n\n• Master NCERT concepts thoroughly\n• Practice numerical problems daily\n• Focus on mechanics, thermodynamics, and modern physics\n• Use dimensional analysis for problem-solving\n• Solve previous year papers and mock tests";
+				} else if (message.includes('chemistry')) {
+					return "JEE Chemistry Tips:\n\n• Balance physical, organic, and inorganic chemistry\n• Memorize important reactions and mechanisms\n• Practice stoichiometry and mole concept problems\n• Use NCERT as your primary resource\n• Solve numerical problems regularly";
+				} else if (message.includes('math')) {
+					return "JEE Mathematics Tips:\n\n• Master calculus, algebra, and coordinate geometry\n• Practice integration and differentiation extensively\n• Focus on trigonometry and complex numbers\n• Solve previous year papers\n• Time management is crucial in JEE";
+				} else {
+					return "JEE Overview:\n\n• Two papers: JEE Main and JEE Advanced\n• Subjects: Physics, Chemistry, Mathematics\n• Duration: 3 hours each\n• Total marks: 300 (JEE Main), 360 (JEE Advanced)\n• Best prep: NCERT + reference books + mock tests";
+				}
+			}
+			
+			// NEET specific
+			if (message.includes('neet')) {
+				return "NEET Preparation Tips:\n\n• Focus on NCERT Biology, Physics, and Chemistry\n• Practice MCQs daily\n• Master the NEET syllabus thoroughly\n• Take regular mock tests\n• Time management: ~1 minute per question\n• Stay updated with current affairs in biology\n• Practice previous year papers";
+			}
+			
+			// CUET specific
+			if (message.includes('cuet')) {
+				return "CUET Preparation Tips:\n\n• Choose your subjects wisely based on your target course\n• Practice with CUET sample papers\n• Focus on NCERT textbooks for domain subjects\n• Prepare for General Test (current affairs, logical reasoning)\n• Time management is crucial\n• Take mock tests regularly";
+			}
+			
+			// ESAT specific
+			if (message.includes('esat')) {
+				return "ESAT Preparation Tips:\n\n• Focus on mathematics, physics, and chemistry\n• Practice problem-solving and analytical skills\n• Work on time management\n• Take practice tests regularly\n• Review fundamental concepts thoroughly\n• Stay consistent with your preparation";
+			}
+			
+			// LSAT specific
+			if (message.includes('lsat')) {
+				return "LSAT Preparation Tips:\n\n• Master logical reasoning and analytical thinking\n• Practice reading comprehension with complex texts\n• Work on logical games and puzzles\n• Take timed practice tests\n• Focus on argument analysis\n• Build vocabulary for better comprehension";
+			}
+			
+			// Time management
+			if (message.includes('time') || message.includes('schedule')) {
+				return "Time Management Tips:\n\n• Create a realistic study schedule\n• Use the Pomodoro Technique (25 min work + 5 min break)\n• Prioritize difficult subjects when you're most alert\n• Take regular breaks to avoid burnout\n• Set specific goals for each study session\n• Review and adjust your schedule weekly";
+			}
+			
+			// Motivation and stress
+			if (message.includes('stress') || message.includes('anxiety') || message.includes('nervous')) {
+				return "Managing Exam Stress:\n\n• Practice deep breathing and meditation\n• Maintain a healthy sleep schedule\n• Exercise regularly\n• Break large tasks into smaller, manageable chunks\n• Celebrate small victories\n• Remember: it's okay to take breaks\n• Talk to friends, family, or counselors if needed";
+			}
+			
+			// General encouragement
+			if (message.includes('help') || message.includes('struggling') || message.includes('difficult')) {
+				return "You've got this! Remember:\n\n• Every expert was once a beginner\n• Progress, not perfection, is the goal\n• Consistency beats intensity\n• Take it one day at a time\n• Don't compare yourself to others\n• Focus on your own journey and growth";
+			}
+			
+			// Default response
+			return "I'm here to help with your exam preparation! I can assist with:\n\n• Study strategies and tips\n• Subject-specific guidance for SAT, JEE, NEET, CUET, ESAT, LSAT\n• Time management techniques\n• Stress management\n• General study advice\n\nWhat specific area would you like help with?";
+		}
+
+		function sendMessage() {
+			const input = document.getElementById('chatInput');
+			const message = input.value.trim();
+			
+			if (!message || isTyping) return;
+			
+			// Add user message
+			addMessage(message, true);
+			input.value = '';
+			
+			// Show typing indicator
+			showTyping();
+			
+			// Simulate AI thinking time
+			setTimeout(() => {
+				hideTyping();
+				const response = getAIResponse(message);
+				addMessage(response);
+			}, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+		}
+
+		// Initialize chat and user status
+		document.addEventListener('DOMContentLoaded', function() {
+			
+			// Auto-open chat after a delay to show it's available
+			setTimeout(() => {
+				if (!chatOpen) {
+					toggleChat();
+					setTimeout(() => {
+						if (chatOpen) toggleChat();
+					}, 2000);
+				}
+			}, 3000);
+		});
+	</script>
+
+	<!-- Firebase SDK -->
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+	<script>
+		// Firebase configuration
+		const firebaseConfig = {
+			apiKey: "AIzaSyB5tK8nsxBWREkBVyeogbQm8WruN1_G_M0",
+			authDomain: "prep-os.firebaseapp.com",
+			projectId: "prep-os",
+			storageBucket: "prep-os.firebasestorage.app",
+			messagingSenderId: "979113812615",
+			appId: "1:979113812615:web:639eae04a51b7991ea0e22",
+			measurementId: "G-CMLKQ4P8KF"
+		};
+
+		// Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+		const auth = firebase.auth();
+		const db = firebase.firestore();
+
+		// Google Sign-In function
+		async function signInWithGoogle() {
+			try {
+				const provider = new firebase.auth.GoogleAuthProvider();
+				const result = await auth.signInWithPopup(provider);
+				console.log('User signed in:', result.user);
+				// The auth state change listener will handle the rest
+			} catch (error) {
+				console.error('Sign-in error:', error);
+				alert('Sign-in failed: ' + error.message);
+			}
+		}
+
+		// Make signInWithGoogle globally available
+		window.signInWithGoogle = signInWithGoogle;
+
+		// Check authentication state
+		auth.onAuthStateChanged((user) => {
+			const loginBtn = document.getElementById('loginBtn');
+			const userInfo = document.getElementById('userInfo');
+			const userName = document.getElementById('userName');
+			const userAvatar = document.getElementById('userAvatar');
+			
+			if (user) {
+				// User is signed in
+				loginBtn.style.display = 'none';
+				userInfo.style.display = 'flex';
+				userName.textContent = user.displayName || user.email.split('@')[0];
+				
+				// Use Firebase photo URL if available, otherwise use first letter
+				if (user.photoURL) {
+					userAvatar.innerHTML = `<img src="${user.photoURL}" alt="User Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+				} else {
+					userAvatar.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+				}
+			} else {
+				// User is signed out
+				loginBtn.style.display = 'inline-block';
+				userInfo.style.display = 'none';
+			}
+		});
+
+		// Logout function
+		async function logout() {
+			try {
+				await auth.signOut();
+				window.location.href = 'landing.html';
+			} catch (error) {
+				console.error('Error signing out:', error);
+				window.location.href = 'landing.html';
+			}
+		}
+
+		// Make logout globally available
+		window.logout = logout;
+
+		// Course selection with authentication check
+		function selectCourse(course) {
+			auth.onAuthStateChanged((user) => {
+				if (user) {
+					// User is authenticated, proceed to year selection
+					window.location.href = `year.html?course=${course}`;
+				} else {
+					// User not authenticated, show login prompt
+					alert('Please login first to access course materials.');
+				}
+			});
+		}
+
+		// Study Assistant Icon handling
+		function setupStudyAssistantIcon() {
+			const icon = document.getElementById('studyAssistantIcon');
+			
+			// Handle icon load success
+			icon.onload = function() {
+				console.log('Study Assistant icon loaded successfully');
+			};
+			
+			// Handle icon load error - show fallback
+			icon.onerror = function() {
+				console.log('Study Assistant icon not found, using fallback');
+				// Replace with a simple emoji or text fallback
+				icon.style.display = 'none';
+				const fallback = document.createElement('div');
+				fallback.className = 'chat-icon';
+				fallback.style.cssText = `
+					width: 32px;
+					height: 32px;
+					background: var(--cream);
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					font-size: 16px;
+					font-weight: bold;
+					color: var(--accent);
+				`;
+				fallback.textContent = '📚';
+				icon.parentNode.replaceChild(fallback, icon);
+			};
+		}
+
+		// Initialize icon handling when page loads
+		document.addEventListener('DOMContentLoaded', setupStudyAssistantIcon);
+	</script>
+</body>
+</html>

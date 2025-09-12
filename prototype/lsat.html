@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LSAT - Prep OS</title>
+	<!-- Firebase SDK -->
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+	<style>
+		:root {
+			--bg: #190019; /* black background */
+			--card: #2B124C; /* purple boxes */
+			--card-2: #522B5B; /* lighter purple for elements */
+			--muted: #DFB6B2; /* muted text */
+			--text: #FBE4D8; /* primary text */
+			--cream: #FBE4D8; /* text on dark */
+			--accent: #522B5B; /* purple accent */
+			--accent-2: #2B124C; /* deeper purple */
+		}
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			background: var(--bg);
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			color: var(--text);
+			line-height: 1.6;
+		}
+
+		/* Sticky Header */
+		.sticky-header {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			background: var(--card);
+			padding: 16px 24px;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			z-index: 1000;
+		}
+		.header-title {
+			font-size: 24px;
+			font-weight: 600;
+			color: var(--cream);
+			text-align: center;
+			flex: 1;
+		}
+		.home-link {
+			color: var(--cream);
+			text-decoration: none;
+			font-size: 16px;
+			font-weight: 500;
+			padding: 8px 12px;
+			border-radius: 8px;
+			transition: all 0.2s;
+		}
+		.home-link:hover { 
+			background: rgba(255,255,255,0.1);
+			text-decoration: none;
+		}
+		.login-btn {
+			background: var(--accent);
+			border: none;
+			border-radius: 8px;
+			padding: 10px 20px;
+			color: var(--cream);
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+			text-decoration: none;
+			display: inline-block;
+		}
+		.login-btn:hover {
+			background: var(--card-2);
+		}
+		.user-info {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			color: var(--cream);
+			font-weight: 600;
+			cursor: pointer;
+			padding: 8px 12px;
+			border-radius: 8px;
+			transition: background-color 0.2s ease;
+		}
+		.user-info:hover {
+			background: rgba(255,255,255,0.1);
+		}
+		.user-avatar {
+			width: 40px;
+			height: 40px;
+			background: var(--accent);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--cream);
+			font-size: 18px;
+			font-weight: 600;
+		}
+
+		/* Main Layout */
+		.main-layout {
+			display: flex;
+			margin-top: 80px;
+			min-height: calc(100vh - 80px);
+		}
+
+		/* Left Navigation */
+		.nav-sidebar {
+			width: 250px;
+			background: var(--card);
+			padding: 24px 0;
+			box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+			position: fixed;
+			left: 0;
+			top: 80px;
+			height: calc(100vh - 80px);
+			overflow-y: auto;
+		}
+		.book-icon {
+			text-align: center;
+			font-size: 32px;
+			margin-bottom: 24px;
+			color: var(--accent);
+		}
+		.nav-item {
+			display: block;
+			width: 100%;
+			background: none;
+			border: none;
+			color: var(--cream);
+			padding: 16px 24px;
+			text-align: left;
+			cursor: pointer;
+			font-size: 16px;
+			font-weight: 500;
+			transition: all 0.2s;
+			border-left: 3px solid transparent;
+		}
+		.nav-item:hover {
+			background: rgba(255,255,255,0.1);
+			border-left-color: var(--accent);
+		}
+		.nav-item.active {
+			background: rgba(255,255,255,0.15);
+			border-left-color: var(--accent);
+		}
+
+		/* Main Content */
+		.main-content {
+			flex: 1;
+			margin-left: 250px;
+			padding: 24px;
+		}
+
+		/* Calendar */
+		.calendar-container {
+			background: var(--card);
+			border-radius: 16px;
+			padding: 32px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+			max-width: 1000px;
+			margin: 0 auto;
+			position: relative;
+		}
+		.calendar-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+		.month-year {
+			font-size: 28px;
+			font-weight: 600;
+		}
+		.nav-btn {
+			background: var(--accent);
+			border: none;
+			color: var(--cream);
+			padding: 8px 16px;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 16px;
+			transition: background 0.2s;
+		}
+		.nav-btn:hover { background: var(--card-2); }
+		.calendar {
+			width: 100%;
+			border-collapse: collapse;
+		}
+		.calendar th, .calendar td {
+			padding: 16px 12px;
+			text-align: center;
+			border: 1px solid var(--accent);
+		}
+		.calendar th {
+			background: var(--accent);
+			font-weight: 600;
+			font-size: 16px;
+		}
+		.calendar td {
+			cursor: pointer;
+			position: relative;
+			height: 80px;
+			vertical-align: top;
+			font-size: 16px;
+		}
+		.calendar td:hover {
+			background: rgba(255,255,255,0.1);
+		}
+		.calendar td.other-month {
+			color: var(--muted);
+		}
+		.calendar td.today {
+			background: rgba(255,255,255,0.2);
+			font-weight: bold;
+		}
+		.event-chip {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 4px 8px;
+			border-radius: 12px;
+			font-size: 12px;
+			font-weight: 500;
+			margin: 2px;
+			cursor: pointer;
+			position: relative;
+		}
+		.event-chip.study {
+			background: #4CAF50;
+			color: white;
+		}
+		.event-chip.practice {
+			background: #FFC107;
+			color: #333;
+		}
+		.event-chip.exam {
+			background: #F44336;
+			color: white;
+		}
+		.event-chip.custom {
+			background: #9C27B0;
+			color: white;
+		}
+		.delete-btn {
+			background: rgba(255, 255, 255, 0.3);
+			border: none;
+			color: white;
+			border-radius: 50%;
+			width: 18px;
+			height: 18px;
+			font-size: 12px;
+			font-weight: bold;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-left: 4px;
+			transition: background 0.2s;
+		}
+		.delete-btn:hover {
+			background: rgba(255, 255, 255, 0.5);
+		}
+
+		/* Content Sections */
+		.content-section {
+			display: none;
+			background: var(--card);
+			border-radius: 16px;
+			padding: 24px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+			max-width: 800px;
+			margin: 0 auto;
+		}
+		.content-section.active {
+			display: block;
+		}
+
+		/* Pomodoro Timer */
+		.timer-container {
+			background: var(--card);
+			border: 1px solid var(--accent);
+			border-radius: 16px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+			padding: 20px;
+			color: var(--cream);
+			display: flex;
+			gap: 20px;
+		}
+		.timer-section {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		.timer-divider {
+			width: 2px;
+			background: var(--accent);
+			margin: 0 10px;
+		}
+		.timer-title {
+			font-size: 18px;
+			font-weight: 600;
+			margin: 0 0 16px 0;
+			text-align: center;
+		}
+		.timer-display {
+			font-size: 48px;
+			font-weight: bold;
+			margin: 16px 0;
+			font-family: 'Courier New', monospace;
+		}
+		.timer-controls {
+			display: flex;
+			gap: 12px;
+			margin-top: 16px;
+		}
+		.timer-btn {
+			background: var(--accent);
+			border: none;
+			color: var(--cream);
+			padding: 12px 20px;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 500;
+			transition: all 0.2s;
+		}
+		.timer-btn:hover:not(:disabled) {
+			background: var(--card-2);
+			transform: translateY(-1px);
+		}
+		.timer-btn:disabled {
+			background: #666;
+			cursor: not-allowed;
+			opacity: 0.6;
+		}
+
+		/* AI Chat */
+		.ai-chat-container {
+			background: var(--card);
+			border-radius: 16px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+			overflow: hidden;
+		}
+		.chat-header {
+			background: var(--accent);
+			padding: 16px 20px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			cursor: pointer;
+		}
+		.chat-title {
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--cream);
+		}
+		.chat-toggle {
+			background: none;
+			border: none;
+			color: var(--cream);
+			font-size: 20px;
+			cursor: pointer;
+		}
+		.chat-messages {
+			max-height: 400px;
+			overflow-y: auto;
+			padding: 20px;
+			display: none;
+		}
+		.chat-messages.active {
+			display: block;
+		}
+		.message {
+			margin-bottom: 16px;
+			padding: 12px 16px;
+			border-radius: 12px;
+			max-width: 80%;
+		}
+		.message.user {
+			background: var(--accent);
+			margin-left: auto;
+		}
+		.message.ai {
+			background: var(--card-2);
+		}
+		.chat-input-container {
+			padding: 20px;
+			display: none;
+		}
+		.chat-input-container.active {
+			display: block;
+		}
+		.chat-input {
+			width: 100%;
+			padding: 12px 16px;
+			border: 1px solid var(--accent);
+			border-radius: 8px;
+			background: rgba(255,255,255,0.1);
+			color: var(--cream);
+			font-size: 14px;
+		}
+		.chat-input::placeholder {
+			color: var(--muted);
+		}
+		.send-btn {
+			background: var(--accent);
+			border: none;
+			color: var(--cream);
+			padding: 12px 20px;
+			border-radius: 8px;
+			cursor: pointer;
+			margin-left: 8px;
+		}
+		.typing-indicator {
+			display: none;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 20px;
+			color: var(--muted);
+			font-style: italic;
+		}
+		.typing-dots {
+			display: flex;
+			gap: 4px;
+		}
+		.typing-dots span {
+			width: 6px;
+			height: 6px;
+			background: var(--muted);
+			border-radius: 50%;
+			animation: typing 1.4s infinite ease-in-out;
+		}
+		.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+		.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+		@keyframes typing {
+			0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+			40% { transform: scale(1); opacity: 1; }
+		}
+
+		/* To-Do List Styles */
+		.todo-header {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-bottom: 30px;
+		}
+		.todo-icon {
+			font-size: 24px;
+		}
+		.todo-title {
+			font-size: 28px;
+			font-weight: 600;
+			color: var(--cream);
+		}
+		.todo-input-container {
+			display: flex;
+			gap: 12px;
+			margin-bottom: 30px;
+		}
+		.todo-input {
+			flex: 1;
+			padding: 12px 16px;
+			border: 2px solid var(--card-2);
+			border-radius: 8px;
+			background: var(--card);
+			color: var(--text);
+			font-size: 16px;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+		.todo-input:focus {
+			border-color: var(--accent);
+		}
+		.todo-input::placeholder {
+			color: var(--muted);
+		}
+		.add-todo-btn {
+			background: var(--accent);
+			border: none;
+			border-radius: 8px;
+			padding: 12px 24px;
+			color: var(--cream);
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+		.add-todo-btn:hover {
+			background: var(--card-2);
+		}
+		.add-todo-plus {
+			background: var(--muted);
+			border: 2px solid var(--cream);
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			color: var(--bg);
+			font-size: 20px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.add-todo-plus:hover {
+			background: var(--cream);
+			border-color: var(--muted);
+			transform: scale(1.1);
+		}
+		.add-todo-plus:active {
+			transform: scale(0.95);
+		}
+		.todo-list {
+			background: var(--card);
+			border-radius: 12px;
+			padding: 20px;
+			min-height: 200px;
+		}
+		.todo-item {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 12px 0;
+			border-bottom: 1px solid var(--card-2);
+			transition: all 0.3s ease;
+		}
+		.todo-item:last-child {
+			border-bottom: none;
+		}
+		.todo-checkbox {
+			width: 20px;
+			height: 20px;
+			border: 2px solid var(--muted);
+			border-radius: 50%;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.2s ease;
+			flex-shrink: 0;
+		}
+		.todo-checkbox:hover {
+			border-color: var(--accent);
+			background: rgba(82, 43, 91, 0.1);
+		}
+		.todo-checkbox.checked {
+			background: var(--accent);
+			border-color: var(--accent);
+		}
+		.todo-checkbox.checked::after {
+			content: '✓';
+			color: var(--cream);
+			font-size: 12px;
+			font-weight: bold;
+		}
+		.todo-text {
+			flex: 1;
+			color: var(--text);
+			font-size: 16px;
+			transition: all 0.3s ease;
+		}
+		.todo-item.checked .todo-text {
+			text-decoration: line-through;
+			opacity: 0.6;
+		}
+		.todo-item.removing {
+			opacity: 0;
+			transform: translateX(-20px);
+		}
+		.empty-todo {
+			text-align: center;
+			color: var(--muted);
+			font-style: italic;
+			padding: 40px 20px;
+		}
+
+		/* Calendar Plus Button */
+		.calendar-plus-btn {
+			position: absolute;
+			top: -15px;
+			right: -15px;
+			background: var(--muted);
+			border: 2px solid var(--cream);
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			color: var(--bg);
+			font-size: 20px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 10;
+		}
+		.calendar-plus-btn:hover {
+			background: var(--cream);
+			border-color: var(--muted);
+			transform: scale(1.1);
+		}
+		.calendar-plus-btn:active {
+			transform: scale(0.95);
+		}
+
+		/* Date Picker Modal */
+		.date-picker-modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.5);
+			display: none;
+			justify-content: center;
+			align-items: center;
+			z-index: 1000;
+		}
+		.date-picker-modal.active {
+			display: flex;
+		}
+		.date-picker-content {
+			background: var(--card);
+			border-radius: 12px;
+			padding: 30px;
+			width: 90%;
+			max-width: 400px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+		}
+		.date-picker-header {
+			text-align: center;
+			margin-bottom: 25px;
+		}
+		.date-picker-title {
+			font-size: 24px;
+			font-weight: 600;
+			color: var(--cream);
+			margin-bottom: 5px;
+		}
+		.date-picker-subtitle {
+			color: var(--muted);
+			font-size: 14px;
+		}
+		.date-picker-form {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+		.date-inputs {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			gap: 15px;
+		}
+		.date-input-group {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+		.date-input-label {
+			font-size: 12px;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+		.date-input {
+			padding: 12px;
+			border: 2px solid var(--card-2);
+			border-radius: 8px;
+			background: var(--bg);
+			color: var(--text);
+			font-size: 16px;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+		.date-input:focus {
+			border-color: var(--accent);
+		}
+		.event-name-input {
+			padding: 12px;
+			border: 2px solid var(--card-2);
+			border-radius: 8px;
+			background: var(--bg);
+			color: var(--text);
+			font-size: 16px;
+			outline: none;
+			transition: border-color 0.2s;
+		}
+		.event-name-input:focus {
+			border-color: var(--accent);
+		}
+		.event-name-input::placeholder {
+			color: var(--muted);
+		}
+		.date-picker-buttons {
+			display: flex;
+			gap: 12px;
+			margin-top: 10px;
+		}
+		.date-picker-btn {
+			flex: 1;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 8px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+		.date-picker-btn.primary {
+			background: var(--accent);
+			color: var(--cream);
+		}
+		.date-picker-btn.primary:hover {
+			background: var(--card-2);
+		}
+		.date-picker-btn.secondary {
+			background: transparent;
+			color: var(--muted);
+			border: 2px solid var(--muted);
+		}
+		.date-picker-btn.secondary:hover {
+			background: var(--muted);
+			color: var(--bg);
+		}
+
+		/* Resources */
+		.res-empty { 
+			color: var(--muted); 
+			font-size: 14px; 
+			text-align: center;
+			padding: 40px 20px;
+		}
+
+		/* Event Menu */
+		.menu { 
+			position: absolute; 
+			z-index: 1000; 
+			background: var(--card); 
+			border: 1px solid var(--accent); 
+			border-radius: 10px; 
+			box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+			overflow: hidden; 
+			min-width: 220px; 
+			display: none;
+		}
+		.menu button { 
+			display: block; 
+			width: 100%; 
+			background: transparent; 
+			color: var(--cream); 
+			text-align: left; 
+			padding: 12px 16px; 
+			border: none; 
+			cursor: pointer; 
+			font-size: 14px; 
+			transition: background 0.2s;
+		}
+		.menu button:hover { 
+			background: rgba(255,255,255,0.1); 
+		}
+
+		.delete-menu {
+			position: absolute;
+			background: var(--card);
+			border: 1px solid var(--accent);
+			border-radius: 8px;
+			padding: 8px 0;
+			z-index: 1001;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+			min-width: 120px;
+			display: none;
+		}
+		.delete-menu button {
+			display: block;
+			width: 100%;
+			padding: 8px 16px;
+			background: none;
+			border: none;
+			color: #ff6b6b;
+			text-align: left;
+			cursor: pointer;
+			font-size: 14px;
+		}
+		.delete-menu button:hover { 
+			background: rgba(255,107,107,0.1); 
+		}
+
+		/* Mobile Responsive */
+		@media (max-width: 768px) {
+			.nav-sidebar {
+				width: 200px;
+			}
+			.main-content {
+				margin-left: 200px;
+			}
+			.timer-container {
+				flex-direction: column;
+			}
+			.timer-divider {
+				width: 100%;
+				height: 2px;
+				margin: 10px 0;
+			}
+		}
+	</style>
+</head>
+<body>
+	<!-- Sticky Header -->
+	<div class="sticky-header">
+		<a href="prototype.html" class="home-link">Home</a>
+		<h1 class="header-title">LSAT • <span id="yearHeading">2025</span></h1>
+		<div id="userSection">
+			<button class="login-btn" id="loginBtn" onclick="signInWithGoogle()">Login with Google</button>
+			<div class="user-info" id="userInfo" style="display: none;" onclick="goToProfile()" title="Click to view profile">
+				<div class="user-avatar" id="userAvatar"></div>
+				<span id="userName"></span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Layout -->
+	<div class="main-layout">
+		<!-- Left Navigation -->
+		<nav class="nav-sidebar">
+			<div class="book-icon"><img src="brinjal.png" alt="Prep OS" style="width: 130px; height: 130px; object-fit: contain;"></div>
+			<button class="nav-item active" onclick="showSection('calendar')">📅 Calendar</button>
+			<button class="nav-item" onclick="showSection('pomodoro')">⏰ Pomodoro Timer</button>
+			<button class="nav-item" onclick="showSection('resources')">📚 Resources</button>
+			<button class="nav-item" onclick="showSection('todo')">✏️ To-Do List</button>
+			<button class="nav-item" onclick="showSection('ai')">🤖 AI Study Assistant</button>
+		</nav>
+
+		<!-- Main Content -->
+		<main class="main-content">
+			<!-- Calendar Section -->
+			<div id="calendar" class="content-section active">
+				<div class="calendar-container">
+					<button class="calendar-plus-btn" onclick="openDatePicker()" title="Add Event">+</button>
+					<div class="calendar-header">
+						<h2>Study Calendar</h2>
+						<div>
+							<button class="nav-btn" id="prevMonth">←</button>
+							<span class="month-year" id="monthYear">January 2025</span>
+							<button class="nav-btn" id="nextMonth">→</button>
+						</div>
+					</div>
+					<table class="calendar" id="calendarTable">
+						<thead>
+							<tr>
+								<th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+							</tr>
+						</thead>
+						<tbody id="calendarBody"></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Pomodoro Timer Section -->
+			<div id="pomodoro" class="content-section">
+				<div class="timer-container">
+					<div class="timer-section">
+						<h2 class="timer-title">Pomodoro Timer</h2>
+						<div class="timer-display" id="timerDisplay">25:00</div>
+						<div class="timer-controls">
+							<button class="timer-btn" id="playBtn">▶ Play</button>
+							<button class="timer-btn" id="pauseBtn" disabled>⏸ Pause</button>
+							<button class="timer-btn" id="resetBtn">⏹ Reset</button>
+						</div>
+					</div>
+					
+					<div class="timer-divider"></div>
+					
+					<div class="timer-section">
+						<h2 class="timer-title">Rest Timer</h2>
+						<div class="timer-display" id="restTimerDisplay">5:00</div>
+						<div class="timer-controls">
+							<button class="timer-btn" id="restPlayBtn">▶ Play</button>
+							<button class="timer-btn" id="restPauseBtn" disabled>⏸ Pause</button>
+							<button class="timer-btn" id="restResetBtn">⏹ Reset</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Resources Section -->
+			<div id="resources" class="content-section">
+				<div class="content-section">
+					<h2>Resources</h2>
+					<p class="res-empty">No resources yet. Check back later.</p>
+				</div>
+			</div>
+
+			<!-- To-Do List Section -->
+			<div id="todo" class="content-section">
+				<div class="todo-header">
+					<span class="todo-icon">✏️</span>
+					<h2 class="todo-title">To-Do List</h2>
+				</div>
+				<div class="todo-input-container">
+					<input type="text" class="todo-input" id="todoInput" placeholder="Add a new reminder...">
+					<button class="add-todo-btn" onclick="addTodo()">Add</button>
+					<button class="add-todo-plus" onclick="addTodo()" title="Add reminder">+</button>
+				</div>
+				<div class="todo-list" id="todoList">
+					<div class="empty-todo">No reminders yet. Add one above!</div>
+				</div>
+			</div>
+
+			<!-- AI Study Assistant Section -->
+			<div id="ai" class="content-section">
+				<div class="ai-chat-container">
+					<div class="chat-header" onclick="toggleChat()">
+						<h3 class="chat-title">AI Study Assistant</h3>
+						<button class="chat-toggle">▼</button>
+					</div>
+				<div class="chat-messages" id="chatMessages">
+					<div class="message ai">
+						Hello! I'm your AI Study Assistant. Ask me anything about LSAT preparation, study strategies, or academic questions!
+					</div>
+				</div>
+				<div class="typing-indicator" id="typingIndicator">
+					<span>AI is typing</span>
+					<div class="typing-dots">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+				</div>
+				<div class="chat-input-container" id="chatInputContainer">
+						<input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything about LSAT prep...">
+						<button class="send-btn" onclick="sendMessage()">Send</button>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+
+	<!-- Date Picker Modal -->
+	<div id="datePickerModal" class="date-picker-modal">
+		<div class="date-picker-content">
+			<div class="date-picker-header">
+				<h3 class="date-picker-title">Add Event</h3>
+				<p class="date-picker-subtitle">Select a date and enter event details</p>
+			</div>
+			<form class="date-picker-form" id="datePickerForm">
+				<div class="date-inputs">
+					<div class="date-input-group">
+						<label class="date-input-label">Day</label>
+						<input type="number" class="date-input" id="eventDay" min="1" max="31" required>
+					</div>
+					<div class="date-input-group">
+						<label class="date-input-label">Month</label>
+						<select class="date-input" id="eventMonth" required>
+							<option value="1">January</option>
+							<option value="2">February</option>
+							<option value="3">March</option>
+							<option value="4">April</option>
+							<option value="5">May</option>
+							<option value="6">June</option>
+							<option value="7">July</option>
+							<option value="8">August</option>
+							<option value="9">September</option>
+							<option value="10">October</option>
+							<option value="11">November</option>
+							<option value="12">December</option>
+						</select>
+					</div>
+					<div class="date-input-group">
+						<label class="date-input-label">Year</label>
+						<input type="number" class="date-input" id="eventYear" min="2025" max="2030" required>
+					</div>
+				</div>
+				<div class="date-input-group">
+					<label class="date-input-label">Event Name</label>
+					<input type="text" class="event-name-input" id="eventName" placeholder="Enter event name..." required>
+				</div>
+				<div class="date-picker-buttons">
+					<button type="button" class="date-picker-btn secondary" onclick="closeDatePicker()">Cancel</button>
+					<button type="submit" class="date-picker-btn primary">Add Event</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		(function() {
+			var COURSE_NAME = 'LSAT';
+			function getYear() {
+				var urlParams = new URLSearchParams(window.location.search);
+				return urlParams.get('year') || '2025';
+			}
+			var currentYear = parseInt(getYear());
+			document.getElementById('yearHeading').textContent = currentYear;
+
+			var state = {
+				currentDate: new Date(),
+				events: []
+			};
+
+			var months = ['January', 'February', 'March', 'April', 'May', 'June',
+				'July', 'August', 'September', 'October', 'November', 'December'];
+
+			// Navigation functions
+			function showSection(sectionId) {
+				// Hide all sections
+				var sections = document.querySelectorAll('.content-section');
+				sections.forEach(function(section) {
+					section.classList.remove('active');
+				});
+
+				// Remove active class from all nav items
+				var navItems = document.querySelectorAll('.nav-item');
+				navItems.forEach(function(item) {
+					item.classList.remove('active');
+				});
+
+				// Show selected section
+				document.getElementById(sectionId).classList.add('active');
+				
+				// Add active class to clicked nav item
+				event.target.classList.add('active');
+			}
+
+			// Make showSection global
+			window.showSection = showSection;
+
+			function renderCalendar() {
+				var year = state.currentDate.getFullYear();
+				var month = state.currentDate.getMonth();
+				var firstDay = new Date(year, month, 1);
+				var lastDay = new Date(year, month + 1, 0);
+				var startDate = new Date(firstDay);
+				startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+				var tbody = document.getElementById('calendarBody');
+				tbody.innerHTML = '';
+
+				for (var week = 0; week < 6; week++) {
+					var row = document.createElement('tr');
+					for (var day = 0; day < 7; day++) {
+						var cell = document.createElement('td');
+						var cellDate = new Date(startDate);
+						cellDate.setDate(startDate.getDate() + (week * 7) + day);
+						
+						cell.textContent = cellDate.getDate();
+						
+						if (cellDate.getMonth() !== month) {
+							cell.classList.add('other-month');
+						}
+						
+						var today = new Date();
+						if (cellDate.toDateString() === today.toDateString()) {
+							cell.classList.add('today');
+						}
+
+						// Add events for this date
+						var dateKey = cellDate.toDateString();
+						var dayEvents = state.events.filter(function(event) {
+							return new Date(event.date).toDateString() === dateKey;
+						});
+
+						dayEvents.forEach(function(event) {
+							var chip = document.createElement('div');
+							chip.className = 'event-chip ' + (event.type || 'custom');
+							chip.dataset.eventId = event.id;
+							
+							// Create event content with delete button
+							var eventContent = document.createElement('span');
+							eventContent.textContent = event.text;
+							chip.appendChild(eventContent);
+							
+							// Create delete button
+							var deleteBtn = document.createElement('button');
+							deleteBtn.className = 'delete-btn';
+							deleteBtn.innerHTML = '×';
+							deleteBtn.title = 'Delete event';
+							chip.appendChild(deleteBtn);
+							
+							cell.appendChild(chip);
+						});
+
+						cell.addEventListener('click', function(clickedDate) {
+							return function(e) {
+								// Don't trigger if clicking on an event chip or delete button
+								if (e.target.classList.contains('event-chip') || e.target.classList.contains('delete-btn')) return;
+								
+								// Prompt for event details
+								var eventText = prompt('Enter event details:');
+								if (eventText && eventText.trim()) {
+									addEvent(clickedDate, eventText.trim());
+								}
+							};
+						}(cellDate));
+
+						row.appendChild(cell);
+					}
+					tbody.appendChild(row);
+				}
+
+				document.getElementById('monthYear').textContent = months[month] + ' ' + year;
+			}
+
+			function addEvent(clickedDate, eventText) {
+				var event = {
+					id: Date.now() + Math.random(),
+					date: clickedDate.toISOString(),
+					text: eventText,
+					type: 'custom' // Default type for custom events
+				};
+
+				state.events.push(event);
+				renderCalendar();
+			}
+
+			window.addEvent = addEvent;
+
+			// Event delegation for delete button clicks
+			document.addEventListener('click', function(e) {
+				if (e.target.classList.contains('delete-btn')) {
+					e.stopPropagation(); // Prevent cell click event
+					var chip = e.target.closest('.event-chip');
+					var eventId = chip.dataset.eventId;
+					deleteEvent(eventId);
+				}
+			});
+
+			function deleteEvent(eventId) {
+				state.events = state.events.filter(function(event) {
+					return event.id != eventId;
+				});
+				renderCalendar();
+				
+				var deleteMenu = document.getElementById('deleteMenu');
+				if (deleteMenu) deleteMenu.remove();
+			}
+
+			window.deleteEvent = deleteEvent;
+
+			// Navigation
+			document.getElementById('prevMonth').addEventListener('click', function() {
+				state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+				renderCalendar();
+			});
+
+			document.getElementById('nextMonth').addEventListener('click', function() {
+				state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+				renderCalendar();
+			});
+
+			// Initialize
+			renderCalendar();
+
+			// Pomodoro Timer functionality
+			var timerState = {
+				timeLeft: 25 * 60, // 25 minutes in seconds
+				isRunning: false,
+				intervalId: null
+			};
+
+			function formatTime(seconds) {
+				var mins = Math.floor(seconds / 60);
+				var secs = seconds % 60;
+				return mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
+			}
+
+			function updateDisplay() {
+				document.getElementById('timerDisplay').textContent = formatTime(timerState.timeLeft);
+			}
+
+			function startTimer() {
+				if (timerState.isRunning) return;
+				timerState.isRunning = true;
+				document.getElementById('playBtn').disabled = true;
+				document.getElementById('pauseBtn').disabled = false;
+				
+				timerState.intervalId = setInterval(function() {
+					timerState.timeLeft--;
+					updateDisplay();
+					
+					if (timerState.timeLeft <= 0) {
+						stopTimer();
+						alert('Pomodoro complete! 🍅');
+						resetTimer();
+					}
+				}, 1000);
+			}
+
+			function stopTimer() {
+				if (!timerState.isRunning) return;
+				timerState.isRunning = false;
+				clearInterval(timerState.intervalId);
+				document.getElementById('playBtn').disabled = false;
+				document.getElementById('pauseBtn').disabled = true;
+			}
+
+			function resetTimer() {
+				stopTimer();
+				timerState.timeLeft = 25 * 60;
+				updateDisplay();
+				document.getElementById('playBtn').disabled = false;
+				document.getElementById('pauseBtn').disabled = true;
+			}
+
+			// Event listeners for timer buttons
+			document.getElementById('playBtn').addEventListener('click', startTimer);
+			document.getElementById('pauseBtn').addEventListener('click', stopTimer);
+			document.getElementById('resetBtn').addEventListener('click', resetTimer);
+
+			// Initialize timer display
+			updateDisplay();
+
+			// Rest Timer functionality
+			var restTimerState = {
+				timeLeft: 5 * 60, // 5 minutes in seconds
+				isRunning: false,
+				intervalId: null
+			};
+
+			function formatRestTime(seconds) {
+				var mins = Math.floor(seconds / 60);
+				var secs = seconds % 60;
+				return mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
+			}
+
+			function updateRestDisplay() {
+				document.getElementById('restTimerDisplay').textContent = formatRestTime(restTimerState.timeLeft);
+			}
+
+			function startRestTimer() {
+				if (restTimerState.isRunning) return;
+				restTimerState.isRunning = true;
+				document.getElementById('restPlayBtn').disabled = true;
+				document.getElementById('restPauseBtn').disabled = false;
+				
+				restTimerState.intervalId = setInterval(function() {
+					restTimerState.timeLeft--;
+					updateRestDisplay();
+					
+					if (restTimerState.timeLeft <= 0) {
+						stopRestTimer();
+						alert('Rest time complete! 🧘‍♀️');
+						resetRestTimer();
+					}
+				}, 1000);
+			}
+
+			function stopRestTimer() {
+				if (!restTimerState.isRunning) return;
+				restTimerState.isRunning = false;
+				clearInterval(restTimerState.intervalId);
+				document.getElementById('restPlayBtn').disabled = false;
+				document.getElementById('restPauseBtn').disabled = true;
+			}
+
+			function resetRestTimer() {
+				stopRestTimer();
+				restTimerState.timeLeft = 5 * 60;
+				updateRestDisplay();
+				document.getElementById('restPlayBtn').disabled = false;
+				document.getElementById('restPauseBtn').disabled = true;
+			}
+
+			// Event listeners for rest timer buttons
+			document.getElementById('restPlayBtn').addEventListener('click', startRestTimer);
+			document.getElementById('restPauseBtn').addEventListener('click', stopRestTimer);
+			document.getElementById('restResetBtn').addEventListener('click', resetRestTimer);
+
+			// Initialize rest timer display
+			updateRestDisplay();
+
+			// AI Chat functionality
+			var chatOpen = false;
+
+			function toggleChat() {
+				chatOpen = !chatOpen;
+				var messages = document.getElementById('chatMessages');
+				var inputContainer = document.getElementById('chatInputContainer');
+				var toggle = document.querySelector('.chat-toggle');
+				
+				if (chatOpen) {
+					messages.classList.add('active');
+					inputContainer.classList.add('active');
+					toggle.textContent = '▲';
+				} else {
+					messages.classList.remove('active');
+					inputContainer.classList.remove('active');
+					toggle.textContent = '▼';
+				}
+			}
+
+		function sendMessage() {
+			const input = document.getElementById('chatInput');
+			const message = input.value.trim();
+			
+			if (!message || isTyping) return;
+			
+			// Add user message
+			addMessage(message, true);
+			input.value = '';
+			
+			// Show typing indicator
+			showTyping();
+			
+			// Simulate AI thinking time
+			setTimeout(() => {
+				hideTyping();
+				const response = getAIResponse(message);
+				addMessage(response);
+			}, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+		}
+
+		function addMessage(content, isUser = false) {
+			const messagesContainer = document.getElementById('chatMessages');
+			const messageDiv = document.createElement('div');
+			messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+			messageDiv.textContent = content;
+			messagesContainer.appendChild(messageDiv);
+			messagesContainer.scrollTop = messagesContainer.scrollHeight;
+		}
+
+		function showTyping() {
+			const typingIndicator = document.getElementById('typingIndicator');
+			typingIndicator.style.display = 'flex';
+			isTyping = true;
+		}
+
+		function hideTyping() {
+			const typingIndicator = document.getElementById('typingIndicator');
+			typingIndicator.style.display = 'none';
+			isTyping = false;
+		}
+
+		function getAIResponse(userMessage) {
+			const message = userMessage.toLowerCase();
+			
+			// Study tips and general advice
+			if (message.includes('study') || message.includes('studying')) {
+				return "Here are some effective study tips:\n\n• Use the Pomodoro Technique (25 min study + 5 min break)\n• Create a consistent study schedule\n• Use active recall and spaced repetition\n• Take practice tests regularly\n• Focus on understanding concepts, not just memorizing\n• Get enough sleep and stay hydrated!";
+			}
+			
+			// SAT specific
+			if (message.includes('sat')) {
+				if (message.includes('math')) {
+					return "SAT Math Tips:\n\n• Master algebra, geometry, and basic trigonometry\n• Practice with official College Board materials\n• Learn to use your calculator efficiently\n• Focus on problem-solving strategies\n• Time management is crucial - aim for 1.25 minutes per question";
+				} else if (message.includes('reading')) {
+					return "SAT Reading Tips:\n\n• Read the passage actively, not passively\n• Look for main ideas and supporting details\n• Don't get stuck on difficult words - use context\n• Answer questions in order of difficulty\n• Practice with diverse passage types";
+				} else if (message.includes('writing')) {
+					return "SAT Writing Tips:\n\n• Learn grammar rules thoroughly\n• Practice identifying sentence errors\n• Focus on clarity and conciseness\n• Understand punctuation rules\n• Read the entire sentence, not just the underlined portion";
+				} else {
+					return "SAT Overview:\n\n• Total time: 3 hours (with essay: 3 hours 50 minutes)\n• Sections: Reading, Writing & Language, Math (No Calculator), Math (Calculator)\n• Score range: 400-1600\n• Best prep: Official College Board practice tests\n• Register at collegeboard.org";
+				}
+			}
+			
+			// JEE specific
+			if (message.includes('jee')) {
+				if (message.includes('physics')) {
+					return "JEE Physics Tips:\n\n• Master NCERT concepts thoroughly\n• Practice numerical problems daily\n• Focus on mechanics, thermodynamics, and modern physics\n• Use dimensional analysis for problem-solving\n• Solve previous year papers and mock tests";
+				} else if (message.includes('chemistry')) {
+					return "JEE Chemistry Tips:\n\n• Balance physical, organic, and inorganic chemistry\n• Memorize important reactions and mechanisms\n• Practice stoichiometry and mole concept problems\n• Use NCERT as your primary resource\n• Solve numerical problems regularly";
+				} else if (message.includes('math')) {
+					return "JEE Mathematics Tips:\n\n• Master calculus, algebra, and coordinate geometry\n• Practice integration and differentiation extensively\n• Focus on trigonometry and complex numbers\n• Solve previous year papers\n• Time management is crucial in JEE";
+				} else {
+					return "JEE Overview:\n\n• Two papers: JEE Main and JEE Advanced\n• Subjects: Physics, Chemistry, Mathematics\n• Duration: 3 hours each\n• Total marks: 300 (JEE Main), 360 (JEE Advanced)\n• Best prep: NCERT + reference books + mock tests";
+				}
+			}
+			
+			// NEET specific
+			if (message.includes('neet')) {
+				return "NEET Preparation Tips:\n\n• Focus on NCERT Biology, Physics, and Chemistry\n• Practice MCQs daily\n• Master the NEET syllabus thoroughly\n• Take regular mock tests\n• Time management: ~1 minute per question\n• Stay updated with current affairs in biology\n• Practice previous year papers";
+			}
+			
+			// CUET specific
+			if (message.includes('cuet')) {
+				return "CUET Preparation Tips:\n\n• Choose your subjects wisely based on your target course\n• Practice with CUET sample papers\n• Focus on NCERT textbooks for domain subjects\n• Prepare for General Test (current affairs, logical reasoning)\n• Time management is crucial\n• Take mock tests regularly";
+			}
+			
+			// ESAT specific
+			if (message.includes('esat')) {
+				return "ESAT Preparation Tips:\n\n• Focus on mathematics, physics, and chemistry\n• Practice problem-solving and analytical skills\n• Work on time management\n• Take practice tests regularly\n• Review fundamental concepts thoroughly\n• Stay consistent with your preparation";
+			}
+			
+			// LSAT specific
+			if (message.includes('lsat')) {
+				return "LSAT Preparation Tips:\n\n• Master logical reasoning and analytical thinking\n• Practice reading comprehension with complex texts\n• Work on logical games and puzzles\n• Take timed practice tests\n• Focus on argument analysis\n• Build vocabulary for better comprehension";
+			}
+			
+			// Time management
+			if (message.includes('time') || message.includes('schedule')) {
+				return "Time Management Tips:\n\n• Create a realistic study schedule\n• Use the Pomodoro Technique (25 min work + 5 min break)\n• Prioritize difficult subjects when you're most alert\n• Take regular breaks to avoid burnout\n• Set specific goals for each study session\n• Review and adjust your schedule weekly";
+			}
+			
+			// Motivation and stress
+			if (message.includes('stress') || message.includes('anxiety') || message.includes('nervous')) {
+				return "Managing Exam Stress:\n\n• Practice deep breathing and meditation\n• Maintain a healthy sleep schedule\n• Exercise regularly\n• Break large tasks into smaller, manageable chunks\n• Celebrate small victories\n• Remember: it's okay to take breaks\n• Talk to friends, family, or counselors if needed";
+			}
+			
+			// General encouragement
+			if (message.includes('help') || message.includes('struggling') || message.includes('difficult')) {
+				return "You've got this! Remember:\n\n• Every expert was once a beginner\n• Progress, not perfection, is the goal\n• Consistency beats intensity\n• Take it one day at a time\n• Don't compare yourself to others\n• Focus on your own journey and growth";
+			}
+			
+			// Default response
+			return "I'm here to help with your exam preparation! I can assist with:\n\n• Study strategies and tips\n• Subject-specific guidance for SAT, JEE, NEET, CUET, ESAT, LSAT\n• Time management techniques\n• Stress management\n• General study advice\n\nWhat specific area would you like help with?";
+		}
+
+		// Add typing indicator variable
+		let isTyping = false;
+
+		// Make functions global
+		window.toggleChat = toggleChat;
+		window.sendMessage = sendMessage;
+
+			// Enter key support for chat
+			document.getElementById('chatInput').addEventListener('keypress', function(e) {
+				if (e.key === 'Enter') {
+					sendMessage();
+				}
+			});
+
+			// Firebase configuration
+			const firebaseConfig = {
+				apiKey: "AIzaSyB5tK8nsxBWREkBVyeogbQm8WruN1_G_M0",
+				authDomain: "prep-os.firebaseapp.com",
+				projectId: "prep-os",
+				storageBucket: "prep-os.firebasestorage.app",
+				messagingSenderId: "979113812615",
+				appId: "1:979113812615:web:639eae04a51b7991ea0e22",
+				measurementId: "G-CMLKQ4P8KF"
+			};
+
+			// Initialize Firebase
+			firebase.initializeApp(firebaseConfig);
+			const auth = firebase.auth();
+			const db = firebase.firestore();
+
+			// User Authentication Functions
+			function checkLoginStatus() {
+				auth.onAuthStateChanged((user) => {
+					if (user) {
+						// User is signed in, get their profile data
+						getUserProfile(user);
+					} else {
+						// User is signed out
+						showLoginButton();
+					}
+				});
+			}
+
+			// Google Sign-In function
+			async function signInWithGoogle() {
+				try {
+					const provider = new firebase.auth.GoogleAuthProvider();
+					const result = await auth.signInWithPopup(provider);
+					console.log('User signed in:', result.user);
+					// The auth state change listener will handle the rest
+				} catch (error) {
+					console.error('Sign-in error:', error);
+					alert('Sign-in failed: ' + error.message);
+				}
+			}
+
+			// Make signInWithGoogle globally available
+			window.signInWithGoogle = signInWithGoogle;
+
+			async function getUserProfile(user) {
+				try {
+					// Use Firebase Auth user data directly
+					const userData = {
+						username: user.displayName || user.email.split('@')[0],
+						photoURL: user.photoURL,
+						email: user.email
+					};
+					showUserInfo(userData);
+				} catch (error) {
+					console.error('Error getting user profile:', error);
+					showLoginButton();
+				}
+			}
+
+			function showUserInfo(user) {
+				document.getElementById('loginBtn').style.display = 'none';
+				document.getElementById('userInfo').style.display = 'flex';
+				document.getElementById('userName').textContent = user.username;
+				
+				// Use Firebase photo URL if available, otherwise use first letter
+				if (user.photoURL) {
+					document.getElementById('userAvatar').innerHTML = `<img src="${user.photoURL}" alt="User Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+				} else {
+					document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+				}
+			}
+
+			function showLoginButton() {
+				document.getElementById('loginBtn').style.display = 'inline-block';
+				document.getElementById('userInfo').style.display = 'none';
+			}
+
+			async function logout() {
+				try {
+					await auth.signOut();
+					window.location.href = 'landing.html';
+				} catch (error) {
+					console.error('Error signing out:', error);
+					window.location.href = 'landing.html';
+				}
+			}
+
+			// Date Picker Functions
+			function openDatePicker() {
+				const modal = document.getElementById('datePickerModal');
+				const today = new Date();
+				
+				// Set default values to today's date
+				document.getElementById('eventDay').value = today.getDate();
+				document.getElementById('eventMonth').value = today.getMonth() + 1;
+				document.getElementById('eventYear').value = today.getFullYear();
+				document.getElementById('eventName').value = '';
+				
+				modal.classList.add('active');
+			}
+
+			function closeDatePicker() {
+				const modal = document.getElementById('datePickerModal');
+				modal.classList.remove('active');
+			}
+
+			function addEventFromPicker(event) {
+				event.preventDefault();
+				
+				const day = parseInt(document.getElementById('eventDay').value);
+				const month = parseInt(document.getElementById('eventMonth').value);
+				const year = parseInt(document.getElementById('eventYear').value);
+				const eventName = document.getElementById('eventName').value.trim();
+				
+				if (!eventName) {
+					alert('Please enter an event name');
+					return;
+				}
+				
+				// Validate date
+				const selectedDate = new Date(year, month - 1, day);
+				if (selectedDate.getDate() !== day || selectedDate.getMonth() !== month - 1 || selectedDate.getFullYear() !== year) {
+					alert('Please enter a valid date');
+					return;
+				}
+				
+				// Add the event
+				addEvent(selectedDate, eventName);
+				
+				// Close modal and reset form
+				closeDatePicker();
+				document.getElementById('datePickerForm').reset();
+			}
+
+			// Close modal when clicking outside
+			document.addEventListener('click', function(event) {
+				const modal = document.getElementById('datePickerModal');
+				if (event.target === modal) {
+					closeDatePicker();
+				}
+			});
+
+			// Handle form submission
+			document.getElementById('datePickerForm').addEventListener('submit', addEventFromPicker);
+
+			// To-Do List Functions
+			var todos = [];
+			var todoIdCounter = 0;
+
+			function addTodo() {
+				const input = document.getElementById('todoInput');
+				const text = input.value.trim();
+				
+				if (text === '') return;
+				
+				const todo = {
+					id: todoIdCounter++,
+					text: text,
+					completed: false
+				};
+				
+				todos.push(todo);
+				input.value = '';
+				renderTodos();
+			}
+
+			function toggleTodo(id) {
+				const todo = todos.find(t => t.id === id);
+				if (todo) {
+					todo.completed = !todo.completed;
+					renderTodos();
+				}
+			}
+
+			function removeTodo(id) {
+				const todoElement = document.querySelector(`[data-todo-id="${id}"]`);
+				if (todoElement) {
+					todoElement.classList.add('removing');
+					
+					setTimeout(() => {
+						todos = todos.filter(t => t.id !== id);
+						renderTodos();
+					}, 2000);
+				}
+			}
+
+			function renderTodos() {
+				const todoList = document.getElementById('todoList');
+				
+				if (todos.length === 0) {
+					todoList.innerHTML = '<div class="empty-todo">No reminders yet. Add one above!</div>';
+					return;
+				}
+				
+				todoList.innerHTML = todos.map(todo => `
+					<div class="todo-item ${todo.completed ? 'checked' : ''}" data-todo-id="${todo.id}">
+						<div class="todo-checkbox ${todo.completed ? 'checked' : ''}" onclick="toggleTodo(${todo.id})"></div>
+						<div class="todo-text" onclick="removeTodo(${todo.id})">${todo.text}</div>
+					</div>
+				`).join('');
+			}
+
+			// Handle Enter key in todo input
+			document.addEventListener('DOMContentLoaded', function() {
+				const todoInput = document.getElementById('todoInput');
+				if (todoInput) {
+					todoInput.addEventListener('keypress', function(e) {
+						if (e.key === 'Enter') {
+							addTodo();
+						}
+					});
+				}
+			});
+
+			function goToProfile() {
+				console.log('goToProfile called');
+				console.log('Current user:', auth.currentUser);
+				if (auth.currentUser) {
+					window.location.href = 'profile.html';
+				} else {
+					console.log('No user logged in, redirecting to login');
+					window.location.href = 'landing.html';
+				}
+			}
+
+			// Make functions global
+			window.logout = logout;
+			window.goToProfile = goToProfile;
+			window.addTodo = addTodo;
+			window.toggleTodo = toggleTodo;
+			window.removeTodo = removeTodo;
+			window.openDatePicker = openDatePicker;
+			window.closeDatePicker = closeDatePicker;
+
+			// Initialize user status
+			checkLoginStatus();
+		})();
+	</script>
+</body>
+</html>

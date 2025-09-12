@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Loading - Prep OS</title>
+	<style>
+		:root {
+			--bg: #190019; /* black background */
+			--card: #2B124C; /* purple boxes */
+			--card-2: #522B5B; /* lighter purple for elements */
+			--muted: #DFB6B2; /* muted text */
+			--text: #FBE4D8; /* primary text */
+			--cream: #FBE4D8; /* text on dark */
+			--accent: #522B5B; /* purple accent */
+			--accent-2: #2B124C; /* deeper purple */
+		}
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			background: var(--bg);
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			color: var(--text);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			overflow: hidden;
+		}
+		.loading-container {
+			text-align: center;
+		}
+		.spinner {
+			width: 60px;
+			height: 60px;
+			border: 4px solid var(--card);
+			border-top: 4px solid var(--cream);
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin: 0 auto 20px;
+		}
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+		.loading-text {
+			font-size: 18px;
+			color: var(--cream);
+			margin-bottom: 10px;
+		}
+		.loading-subtext {
+			font-size: 14px;
+			color: var(--muted);
+		}
+	</style>
+</head>
+<body>
+	<div class="loading-container">
+		<div class="spinner"></div>
+		<div class="loading-text" id="loadingText">Loading your course...</div>
+		<div class="loading-subtext">Please wait while we prepare everything for you</div>
+	</div>
+
+	<script>
+		(function() {
+			const urlParams = new URLSearchParams(window.location.search);
+			const course = urlParams.get('course');
+			const year = urlParams.get('year');
+			
+			// Update loading text
+			if (course) {
+				document.getElementById('loadingText').textContent = `Loading ${course} ${year}...`;
+			}
+			
+			// Simulate loading time
+			setTimeout(function() {
+				if (course) {
+					window.location.href = `${course.toLowerCase()}.html?year=${year}`;
+				} else {
+					window.location.href = 'prototype.html';
+				}
+			}, 2500);
+		})();
+	</script>
+</body>
+</html>
