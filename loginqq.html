@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prep OS - Setup Questionnaire</title>
+    <style>
+        :root {
+            --bg: #190019;
+            --card: #2B124C;
+            --card-2: #522B5B;
+            --muted: #DFB6B2;
+            --text: #FBE4D8;
+            --cream: #FBE4D8;
+            --accent: #522B5B;
+            --accent-2: #2B124C;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .questionnaire-container {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+
+        .question-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 10px;
+        }
+
+        .question-subtitle {
+            font-size: 16px;
+            color: var(--muted);
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--accent-2);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .question {
+            display: none;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option {
+            background: var(--card-2);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .option:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            border-color: var(--accent);
+            background: var(--accent);
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--muted);
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: var(--muted);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: var(--muted);
+            color: var(--card);
+        }
+
+        .back-btn.hidden {
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--accent-2);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .questionnaire-container {
+                padding: 30px 20px;
+            }
+            
+            .question-title {
+                font-size: 24px;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="questionnaire-container">
+        <img src="PREP-OS-TITLE-LOGO.png" alt="Prep OS" class="logo">
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Question 1: Exam Selection -->
+        <div class="question active" id="question1">
+            <h2 class="question-title">Which exam are you taking?</h2>
+            <p class="question-subtitle">Select the exam you're preparing for</p>
+            <div class="options-grid">
+                <div class="option" data-exam="SAT">SAT</div>
+                <div class="option" data-exam="NEET">NEET</div>
+                <div class="option" data-exam="JEE">JEE</div>
+                <div class="option" data-exam="CUET">CUET</div>
+                <div class="option" data-exam="ESAT">ESAT</div>
+                <div class="option" data-exam="LSAT">LSAT</div>
+            </div>
+        </div>
+
+        <!-- Question 2: Year Selection -->
+        <div class="question" id="question2">
+            <h2 class="question-title">What year are you giving this exam?</h2>
+            <p class="question-subtitle">Select your target exam year</p>
+            <div class="options-grid">
+                <div class="option" data-year="2025">2025</div>
+                <div class="option" data-year="2026">2026</div>
+                <div class="option" data-year="2027">2027</div>
+                <div class="option" data-year="2028">2028</div>
+            </div>
+            <button class="back-btn" onclick="goToPreviousQuestion()">← Back</button>
+        </div>
+
+        <!-- Question 3: Target Score Selection -->
+        <div class="question" id="question3">
+            <h2 class="question-title">How much are you aiming for?</h2>
+            <p class="question-subtitle" id="scoreSubtitle">Select your target score</p>
+            <div class="options-grid" id="scoreOptions">
+                <!-- Options will be populated dynamically based on exam selection -->
+            </div>
+            <button class="back-btn" onclick="goToPreviousQuestion()">← Back</button>
+        </div>
+
+        <!-- Loading Screen -->
+        <div class="loading" id="loadingScreen">
+            <div class="spinner"></div>
+            <p class="loading-text">Setting up your personalized Prep OS experience...</p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5tK8nsxBWREkBVyeogbQm8WruN1_G_M0",
+            authDomain: "prep-os.firebaseapp.com",
+            projectId: "prep-os",
+            storageBucket: "prep-os.firebasestorage.app",
+            messagingSenderId: "979113812615",
+            appId: "1:979113812615:web:639eae04a51b7991ea0e22",
+            measurementId: "G-CMLKQ4P8KF"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Questionnaire state
+        const state = {
+            currentQuestion: 1,
+            selectedExam: null,
+            selectedYear: null,
+            selectedScore: null
+        };
+
+        // Score options for each exam
+        const scoreOptions = {
+            'SAT': ['1350+', '1400+', '1450+', '1500+'],
+            'NEET': ['450+', '600+', '700+'],
+            'CUET': ['400+', '500+', '600+', '700+'],
+            'JEE': ['150+', '200+', '270+'],
+            'ESAT': ['Mid Percentile', 'High Percentile', 'Top Percentile'],
+            'LSAT': ['140+', '160+', '170+']
+        };
+
+        // Exam to HTML file mapping
+        const examToFile = {
+            'SAT': 'sat.html',
+            'NEET': 'neet.html',
+            'JEE': 'jee.html',
+            'CUET': 'cuet.html',
+            'ESAT': 'esat.html',
+            'LSAT': 'lsat.html'
+        };
+
+        // Initialize the questionnaire
+        function init() {
+            // Check if user is authenticated
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // User is authenticated, proceed with questionnaire
+                    updateProgress();
+                    setupEventListeners();
+                } else {
+                    // User is not authenticated, redirect to landing page
+                    window.location.href = 'landing.html';
+                }
+            });
+        }
+
+        // Setup event listeners for option selection
+        function setupEventListeners() {
+            // Question 1: Exam selection
+            document.querySelectorAll('#question1 .option').forEach(option => {
+                option.addEventListener('click', () => {
+                    selectOption(option, 'exam');
+                    state.selectedExam = option.dataset.exam;
+                    setTimeout(() => {
+                        showQuestion(2);
+                        updateScoreOptions();
+                    }, 300);
+                });
+            });
+
+            // Question 2: Year selection
+            document.querySelectorAll('#question2 .option').forEach(option => {
+                option.addEventListener('click', () => {
+                    selectOption(option, 'year');
+                    state.selectedYear = option.dataset.year;
+                    setTimeout(() => {
+                        showQuestion(3);
+                    }, 300);
+                });
+            });
+
+            // Question 3: Score selection (delegated event listener)
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('option') && e.target.closest('#question3')) {
+                    selectOption(e.target, 'score');
+                    state.selectedScore = e.target.dataset.score;
+                    setTimeout(() => {
+                        completeQuestionnaire();
+                    }, 300);
+                }
+            });
+        }
+
+        // Select an option and update UI
+        function selectOption(option, type) {
+            // Remove previous selection
+            const container = option.closest('.question');
+            container.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            
+            // Select current option
+            option.classList.add('selected');
+        }
+
+        // Show specific question
+        function showQuestion(questionNumber) {
+            // Hide all questions
+            document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+            
+            // Show target question
+            document.getElementById(`question${questionNumber}`).classList.add('active');
+            
+            // Update current question
+            state.currentQuestion = questionNumber;
+            updateProgress();
+        }
+
+        // Go to previous question
+        function goToPreviousQuestion() {
+            if (state.currentQuestion > 1) {
+                showQuestion(state.currentQuestion - 1);
+            }
+        }
+
+        // Update score options based on selected exam
+        function updateScoreOptions() {
+            const scoreOptionsContainer = document.getElementById('scoreOptions');
+            const scoreSubtitle = document.getElementById('scoreSubtitle');
+            
+            // Clear existing options
+            scoreOptionsContainer.innerHTML = '';
+            
+            // Get score options for selected exam
+            const options = scoreOptions[state.selectedExam] || [];
+            
+            // Update subtitle
+            scoreSubtitle.textContent = `Select your target score for ${state.selectedExam}`;
+            
+            // Create option elements
+            options.forEach(score => {
+                const option = document.createElement('div');
+                option.className = 'option';
+                option.dataset.score = score;
+                option.textContent = score;
+                scoreOptionsContainer.appendChild(option);
+            });
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (state.currentQuestion / 3) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        // Complete questionnaire and redirect
+        async function completeQuestionnaire() {
+            // Show loading screen
+            document.querySelectorAll('.question').forEach(q => q.style.display = 'none');
+            document.getElementById('loadingScreen').style.display = 'flex';
+            
+            try {
+                // Get current user
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error('User not authenticated');
+                }
+                
+                // Store user preferences in localStorage
+                const userPreferences = {
+                    exam: state.selectedExam,
+                    year: state.selectedYear,
+                    score: state.selectedScore,
+                    completedAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem('prepOS_preferences', JSON.stringify(userPreferences));
+                
+                // Store user preferences in Firebase Firestore
+                await db.collection('users').doc(user.uid).set({
+                    preferences: userPreferences,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                
+                console.log('User preferences saved successfully');
+                
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+                // Continue with redirect even if Firestore save fails
+            }
+            
+            // Redirect to appropriate course page after a short delay
+            setTimeout(() => {
+                const targetFile = examToFile[state.selectedExam];
+                if (targetFile) {
+                    window.location.href = targetFile;
+                } else {
+                    console.error('No target file found for exam:', state.selectedExam);
+                    window.location.href = 'prototype.html';
+                }
+            }, 2000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
