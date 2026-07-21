@@ -8,11 +8,7 @@
   <strong>A student-built platform for competitive exam preparation — calendars, timers, resources, and study help in one place.</strong>
 </p>
 
-<p align="center">
-  <span style="display:inline-block; background:#2B124C; color:#FBE4D8; padding:0.35em 0.85em; border-radius:999px; font-size:0.85em; font-weight:600; margin:0.2em;">Static web app</span>
-  <span style="display:inline-block; background:#522B5B; color:#FBE4D8; padding:0.35em 0.85em; border-radius:999px; font-size:0.85em; font-weight:600; margin:0.2em;">Sign in with Google</span>
-  <span style="display:inline-block; background:#2B124C; color:#DFB6B2; padding:0.35em 0.85em; border-radius:999px; font-size:0.85em; font-weight:600; margin:0.2em;">Prototype</span>
-</p>
+
 
 <p align="center">
   <img src="brinjal.png" alt="Prep OS mascot" width="200">
